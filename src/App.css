@@ -1,0 +1,78 @@
+/* Menü açılış animasyonu */
+.menu-slide-enter {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+.menu-slide-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms, transform 300ms;
+}
+.menu-slide-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+.menu-slide-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Ekstra içerik geçiş animasyonu */
+.slide-enter {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+.slide-enter-active {
+  max-height: 100px;
+  opacity: 1;
+  transition: max-height 300ms ease-in-out, opacity 300ms ease-in-out;
+}
+.slide-exit {
+  max-height: 100px;
+  opacity: 1;
+}
+.slide-exit-active {
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 300ms ease-in-out, opacity 300ms ease-in-out;
+}
+
+/* Mobil menü tam ekran geçiş animasyonu */
+@media (max-width: 768px) {
+  .menu-slide-enter {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  .menu-slide-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  .menu-slide-exit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .menu-slide-exit-active {
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: opacity 300ms, transform 300ms;
+  }
+}
+
+/* --- */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+

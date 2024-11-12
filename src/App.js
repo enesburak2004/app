@@ -1,75 +1,115 @@
-import React from 'react';
-import { Collapse } from 'antd';
-import 'antd/dist/reset.css'; // Ant Design stilleri
+import React, { useState, useEffect } from 'react';
+import { Accordion, AccordionSummary, AccordionDetails, IconButton, Typography, useMediaQuery, Drawer } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
+import './App.css';
 
-const { Panel } = Collapse;
+const AccordionMenu = ({ onLinkClick, onContentClick, closeMenu }) => {
+  const [openExtras, setOpenExtras] = useState({
+    1: false, 2: false, 3: false, 4: false
+  });
 
-const AccordionMenu = ({ onLinkClick, onContentClick }) => {
-  const onChange = (key) => {
-    console.log(key);
+  const toggleExtraContent = (key) => {
+    setOpenExtras((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleOptionClick = (key, content, url) => {
+    if (url) {
+      onLinkClick(url);
+    } else {
+      onContentClick(content);
+    }
+    closeMenu();
   };
 
   return (
-    <Collapse
-      defaultActiveKey={['1']}
-      onChange={onChange}
-      accordion
-      style={{ flexGrow: 1 }}
-    >
-      <Panel header="Seçenek 1" key="1" style={{ marginBottom: '15px' }}>
-        <p onClick={() => onContentClick('Seçenek 1 İçeriği')}>
-          Seçenek 1 İçeriği (Tıklanabilir)
-        </p>
-      </Panel>
-      <Panel header="Seçenek 2" key="2" style={{ marginBottom: '15px' }}>
-        <p onClick={() => onContentClick('Seçenek 2 İçeriği')}>
-          Seçenek 2 İçeriği (Tıklanabilir)
-        </p>
-      </Panel>
-      <Panel header="Seçenek 3" key="3" style={{ marginBottom: '15px' }}>
-        <p onClick={() => onContentClick('Seçenek 3 İçeriği')}>
-          Seçenek 3 İçeriği (Tıklanabilir)
-        </p>
-      </Panel>
-      <Panel header="Seçenek 4 - URL ile" key="4" style={{ marginBottom: '15px' }}>
-        <p>
-          Bu seçenekte bir{' '}
-          <a href="#" onClick={(e) => { e.preventDefault(); onLinkClick(); }}>
-            URL bağlantısına
-          </a>{' '}
-          gidin.
-        </p>
-      </Panel>
-    </Collapse>
+    <div style={{ flexGrow: 1 }}>
+      {[1, 2, 3, 4].map((key) => {
+        const urlMap = {
+          1: 'https://www.example.com',
+          2: 'https://www.example2.com',
+          3: 'https://www.example3.com',
+          4: 'https://www.example4.com',
+        };
+        return (
+          <Accordion key={key} sx={{ marginBottom: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography>Seçenek {key}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography onClick={() => handleOptionClick(key, `Seçenek ${key} İçeriği`, urlMap[key])}>
+                Seçenek {key} İçeriği (Tıklanabilir)
+              </Typography>
+              {openExtras[key] && (
+                <Typography style={{ marginLeft: '20px' }}>
+                  - Bu seçenekte bir <a href="#" onClick={(e) => { e.preventDefault(); handleOptionClick(key, null, urlMap[key]); }}>URL bağlantısına</a> gidin.
+                </Typography>
+              )}
+            </AccordionDetails>
+          </Accordion>
+        );
+      })}
+    </div>
   );
 };
 
 const App = () => {
-  const [content, setContent] = React.useState(''); // Seçilen içerik durumu
-  const [url, setUrl] = React.useState(''); // URL durumu
+  const [content, setContent] = useState('');
+  const [url, setUrl] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width:768px)');
 
-  const handleLinkClick = () => {
-    setUrl('https://www.example.com'); // URL güncelleniyor
+  const handleLinkClick = (link) => {
+    setUrl(link);
+    setIsMenuOpen(false);
   };
 
   const handleContentClick = (content) => {
-    setContent(content); // İçerik güncelleniyor
-    setUrl(''); // URL sıfırlanıyor ki içerik görünür olsun
+    setContent(content);
+    setUrl('');
+    setIsMenuOpen(false);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Üstte Beyaz Bölüm */}
-      <div style={{ backgroundColor: '#ffffff', padding: '20px', borderBottom: '1px solid #f0f0f0' }}>
+      {/* Üst Bölüm */}
+      <div style={{ backgroundColor: '#ffffff', padding: '20px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Üst Bölüm</h2>
+        {isMobile && (
+          <IconButton onClick={toggleMenu}>
+            {isMenuOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
+          </IconButton>
+        )}
       </div>
 
       {/* İçerik Alanı */}
-      <div style={{ display: 'flex', flexGrow: 1 }}>
-        {/* Sol Menü */}
-        <div style={{ backgroundColor: '#f0f2f5', padding: '20px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <AccordionMenu onLinkClick={handleLinkClick} onContentClick={handleContentClick} />
-        </div>
+      <div style={{ display: 'flex', flexGrow: 1, position: 'relative' }}>
+        {/* Mobil Menü */}
+        {isMobile && (
+          <Drawer anchor="left" open={isMenuOpen} onClose={toggleMenu}>
+            <div style={{ width: '250px', padding: '20px' }}>
+              <AccordionMenu onLinkClick={handleLinkClick} onContentClick={handleContentClick} closeMenu={() => setIsMenuOpen(false)} />
+            </div>
+          </Drawer>
+        )}
+
+        {/* Masaüstü Sol Menü */}
+        {!isMobile && (
+          <div style={{
+            backgroundColor: '#f0f2f5',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '250px',
+          }}>
+            <AccordionMenu onLinkClick={handleLinkClick} onContentClick={handleContentClick} closeMenu={() => {}} />
+          </div>
+        )}
 
         {/* Sağ İçerik Alanı */}
         <div style={{ flexGrow: 1, padding: '20px' }}>
@@ -86,6 +126,22 @@ const App = () => {
               <p>Burası ana içerik alanıdır. Akordiyon menüden bir seçenek seçildiğinde ilgili içerik burada gösterilebilir.</p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Alt Bölüm */}
+      <div style={{ backgroundColor: '#f0f0f0', padding: '20px', display: 'flex' }}>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <h3>Bölüm 1</h3>
+          <p>Bu bölüm, sayfanın alt kısmında birinci sütundur.</p>
+        </div>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <h3>Bölüm 2</h3>
+          <p>Bu bölüm, sayfanın alt kısmında ikinci sütundur.</p>
+        </div>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <h3>Bölüm 3</h3>
+          <p>Bu bölüm, sayfanın alt kısmında üçüncü sütundur.</p>
         </div>
       </div>
     </div>
