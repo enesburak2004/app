@@ -14,6 +14,8 @@ const AccordionMenu = ({ onLinkClick, onContentClick, closeMenu }) => {
     setOpenExtras((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+
+  
   const handleOptionClick = (key, content, url) => {
     if (url) {
       onLinkClick(url);
